@@ -24,6 +24,8 @@ using masterworker::FileLocations;
 using masterworker::MasterQuery;
 using masterworker::MasterWorker;
 
+using namespace std;
+
 
 
 /* CS6210_TASK: Handle all the bookkeeping that Master is supposed to do.
@@ -89,6 +91,7 @@ void Master::run_mapper(){
 	Shard shard;
 	int w_count = 0;
 	for(auto worker: spec.workerAddr) {
+        cout << worker << endl;
 		shard.set_filename(shards[cur_shard_index].filename);
 		shard.set_id(shards[cur_shard_index].id);
 		shard.set_startbyte(shards[cur_shard_index].startByte);
@@ -101,6 +104,7 @@ void Master::run_mapper(){
 		AsyncClientCall* call = new AsyncClientCall;
   		call->response_reader = stubs_[w_count]->PrepareAsyncmapReduceQuery(&call->context, query, &cq);
 
+        cout << "bowbowbow" << endl;
 		call->response_reader->StartCall();
   		call->response_reader->Finish(&call->reply, &call->status, (void*)call);
 		w_count++;

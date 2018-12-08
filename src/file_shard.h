@@ -58,8 +58,8 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 			fileObj.close();
 		}
 	}
-	cout << "bowbow" << endl;
-	cout << fileShards.size() << endl;
-	printShards(fileShards);
+	// cout << "bowbow" << endl;
+	// cout << fileShards.size() << endl;
+	// printShards(fileShards);
 	return true;
 }

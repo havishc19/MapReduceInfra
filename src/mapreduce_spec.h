@@ -83,7 +83,7 @@ inline bool read_mr_spec_from_config_file(const std::string& config_filename, Ma
 		}
 		inFile.close();
 	}
-	printSpec(mr_spec);	
+	// printSpec(mr_spec);	
 	return true;
 }
 

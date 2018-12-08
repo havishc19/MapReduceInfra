@@ -4,6 +4,8 @@
 #include <iostream>
 #include <fstream>
 
+using namespace std;
+
 /* CS6210_TASK Implement this data structureas per your implementation.
 		You will need this when your worker is running the map task*/
 struct BaseMapperInternal {
