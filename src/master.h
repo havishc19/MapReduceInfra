@@ -86,28 +86,35 @@ Master::Master(const MapReduceSpec& mr_spec, const std::vector<FileShard>& file_
 }
 
 void Master::run_mapper(){
-	MapperQuery mapper_query;
-	MasterQuery query;
-	Shard shard;
+	MapperQuery *mapper_query;
+	MasterQuery *query;
+	Shard *shard;
 	int w_count = 0;
 	for(auto worker: spec.workerAddr) {
+		
         cout << worker << endl;
-		shard.set_filename(shards[cur_shard_index].filename);
-		shard.set_id(shards[cur_shard_index].id);
-		shard.set_startbyte(shards[cur_shard_index].startByte);
-		shard.set_endbyte(shards[cur_shard_index].endByte);
+        mapper_query = new MapperQuery();
+        shard = new Shard();
+        query = new MasterQuery();
+		shard->set_filename(shards[cur_shard_index].filename);
+		shard->set_id(shards[cur_shard_index].id);
+		shard->set_startbyte(shards[cur_shard_index].startByte);
+		shard->set_endbyte(shards[cur_shard_index].endByte);
 
-		mapper_query.set_allocated_shard(&shard);
-		query.set_allocated_mapperquery(&mapper_query);
+		mapper_query->set_allocated_shard(shard);
+		query->set_allocated_mapperquery(mapper_query);
 
 
 		AsyncClientCall* call = new AsyncClientCall;
-  		call->response_reader = stubs_[w_count]->PrepareAsyncmapReduceQuery(&call->context, query, &cq);
+  		call->response_reader = stubs_[w_count]->PrepareAsyncmapReduceQuery(&call->context, *query, &cq);
 
-        cout << "bowbowbow" << endl;
 		call->response_reader->StartCall();
   		call->response_reader->Finish(&call->reply, &call->status, (void*)call);
+        cout << "bowbowbow" << endl;
 		w_count++;
+		// delete shard;
+		// delete query;
+		// delete mapper_query;
 	}
 
 	void* got_tag;
@@ -117,23 +124,24 @@ void Master::run_mapper(){
 
 	Status status = Status::OK;
 
-	while ( cur_shard_index < shards.size() && cq.Next(&got_tag, &ok)) {
-	AsyncClientCall* call = static_cast<AsyncClientCall*>(got_tag);
+	while (cq.Next(&got_tag, &ok)) {
+		AsyncClientCall* call = static_cast<AsyncClientCall*>(got_tag);
 
-	GPR_ASSERT(ok);
-	if (call->status.ok())  {
+		GPR_ASSERT(ok);
+		if (call->status.ok())  {
 
-		for (const auto result : call->reply.locations().filename()) {
-	    	std::cout << "file: " << result << std::endl;
+			for (const auto result : call->reply.locations().filename()) {
+		    	std::cout << "file: " << result << std::endl;
+			}
 		}
-	}
-	else{
-	  status = call->status;
-	  break;
-	} 
+		else{
+			status = call->status;
+			std::cerr << "Hi there" << endl;
+		  	break;
+		} 
 
-	// Once we're complete, deallocate the call object.
-	delete call;
+		// Once we're complete, deallocate the call object.
+		delete call;
 	}
 }
 
