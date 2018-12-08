@@ -34,6 +34,14 @@ extern std::shared_ptr<BaseMapper> get_mapper_from_task_factory(const std::strin
 extern std::shared_ptr<BaseReducer> get_reducer_from_task_factory(const std::string& user_id);
 
 
+void ReplaceStringInPlace(string& subject, string search, string replace) {
+    size_t pos = 0;
+    while ((pos = subject.find(search, pos)) != std::string::npos) {
+         subject.replace(pos, search.length(), replace);
+         pos += replace.length();
+    }
+}
+
 /* CS6210_TASK: Handle all the task a Worker is supposed to do.
 	This is a big task for this project, will test your understanding of map reduce */
 class Worker {
@@ -106,6 +114,7 @@ class Worker {
 							line[endByte-startByte+1] = 0;
 							fileObj.close();
 							inputLine = line;
+							ReplaceStringInPlace(inputLine, "\n", " ");
 							mapper->map(inputLine);
 						}
 						vector<string> fileNames = mapper->impl_->_fileNames;
@@ -124,7 +133,6 @@ class Worker {
 		        		reducer->impl_->_fileNumber = request_.reducerquery().partitionid();
 		        		cout<<"Partitionid="<<request_.reducerquery().partitionid()<<endl;
 		        		for(const auto fileName : request_.reducerquery().locations().filename()){
-		        			cout << fileName << endl;
 		        			vector<string> values;
 		        			string line;
 		        			ifstream fileObj(fileName);
