@@ -14,13 +14,13 @@ message MapperQuery {
 }
 
 message Shard {
-	int id = 1;
+	int32 id = 1;
 	string filename = 2;
-	int startByte = 3;
-	int endByte = 4;
+	int32 startByte = 3;
+	int32 endByte = 4;
 }
 
-message ReduceQuery {
+message ReducerQuery {
 	FileLocations locations = 1;
 }
 
@@ -35,5 +35,6 @@ message FileLocations {
 message MasterQuery {
 	MapperQuery mapperQuery = 1;
 	ReducerQuery reducerQuery = 2;
+	int32 type = 3;
 }
 
