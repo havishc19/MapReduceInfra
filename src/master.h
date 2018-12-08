@@ -98,6 +98,7 @@ Master::Master(const MapReduceSpec& mr_spec, const std::vector<FileShard>& file_
 void Master::makeMapperRpcCall(string worker_address, int worker_id){
 		MapperQuery *mapper_query;
 		MasterQuery query;
+        query.set_type(0);
 		Shard *shard;
         mapper_query = query.mutable_mapperquery();
         shard = mapper_query->mutable_shard();
@@ -143,11 +144,12 @@ void Master::run_mapper(){
 		if (call->status.ok())  {
 
 			for (const auto result : call->reply.locations().filename()) {
-		    	std::cout << "file: " << result << std::endl;
+		    	// std::cout << "file: " << result << std::endl;
 		    	unique_filelist.insert(result);
 			}
 
 			//break if all shards are complete.
+            cout << cur_shard_index << " " << shards.size() << endl;
 			if(cur_shard_index >= shards.size())
 				break;
 
@@ -172,6 +174,8 @@ void Master::run_mapper(){
 void Master::makeReducerRpcCall(string worker_address, int worker_id){
 		ReducerQuery *reducer_query;
 		MasterQuery query;
+        query.set_type(123);
+        cout << "Setting tyupe" << endl;
 		FileLocations *locations;
 
         reducer_query = query.mutable_reducerquery();
@@ -240,6 +244,7 @@ void Master::run_reducer(){
 /* CS6210_TASK: Here you go. once this function is called you will complete whole map reduce task and return true if succeeded */
 bool Master::run() {
 	run_mapper();
+    cout << "Mapper done" << endl;
 	run_reducer();
 	return true;
 }

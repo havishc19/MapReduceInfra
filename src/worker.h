@@ -84,9 +84,10 @@ class Worker {
 		        service_->RequestmapReduceQuery(&ctx_, &request_, &responder_, cq_, cq_,
 		                                  this);
 		      } else if (status_ == PROCESS) {
-		        	cout << "Reached Here " << endl;
 	        		// Mapper query
+		      		cout << request_.type() << endl;
 					if(request_.type() == 0) {
+						cout << "Mapper Req received!" << endl;
 						auto mapper = get_mapper_from_task_factory("cs6210");
 		        		// Get shard and details
 			        	Shard sh = request_.mapperquery().shard();
@@ -104,7 +105,6 @@ class Worker {
 							line[endByte-startByte+1] = 0;
 							fileObj.close();
 							inputLine = line;
-							cout << line << endl;
 							mapper->map(inputLine);
 						}
 						vector<string> fileNames = mapper->impl_->_fileNames;
@@ -113,15 +113,16 @@ class Worker {
 
 						for(int i=0;i<fileNames.size();i++){
 							locations->add_filename(fileNames[i]);
-							// fileNames->set_filename(fileNames[i]);
-							// cout << fileNames[i] << endl;
 						}
+						// status_ = FINISH;
+						responder_.Finish(reply_, Status::OK, this);
 		        	}
 		        	else{
+		        		cout << "Redcuer Called" << endl;
 		        		auto reducer = get_reducer_from_task_factory("cs6210");
 		        		reducer->impl_->_fileNumber = request_.reducerquery().partitionid();
 		        		for(const auto fileName : request_.reducerquery().locations().filename()){
-		        			cout << fileName << endl;
+		        			// cout << fileName << endl;
 		        			vector<string> values;
 		        			string line;
 		        			ifstream fileObj(fileName);
