@@ -2,6 +2,7 @@
 
 #include <string>
 #include <iostream>
+#include <fstream>
 
 /* CS6210_TASK Implement this data structureas per your implementation.
 		You will need this when your worker is running the map task*/
@@ -25,7 +26,20 @@ inline BaseMapperInternal::BaseMapperInternal() {
 
 /* CS6210_TASK Implement this function */
 inline void BaseMapperInternal::emit(const std::string& key, const std::string& val) {
-	std::cout << "Dummy emit by BaseMapperInternal: " << key << ", " << val << std::endl;
+	//Check if the file for key exists
+    ifstream testStream(key+".txt");
+    if(testStream.good()) {
+    	//File already exists -> append
+		ofstream outfile;
+		outfile.open(key+".txt", ios_base::app);
+		outfile << val+"\n"; 
+		outfile.close();
+    } else {
+    	//File does not exist, create one
+    	ofstream outfile(key+".txt");
+		outfile << val+"\n";
+		outfile.close();
+    }
 }
 
 
