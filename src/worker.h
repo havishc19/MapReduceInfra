@@ -94,9 +94,9 @@ class Worker {
 		      } else if (status_ == PROCESS) {
 	        		// Mapper query
 			      	new CallData(service_, cq_);
-		      		cout << "Worker type: " << request_.type() << endl;
+		      		// cout << "Worker type: " << request_.type() << endl;
 					if(request_.type() == 0) {
-						cout << "Mapper Req received!" << endl;
+						// cout << "Mapper Req received!" << endl;
 						auto mapper = get_mapper_from_task_factory("cs6210");
 		        		// Get shard and details
 			        	Shard sh = request_.mapperquery().shard();
@@ -128,20 +128,26 @@ class Worker {
 						responder_.Finish(reply_, Status::OK, this);
 		        	}
 		        	else{
-		        		cout << "Redcuer Called" << endl;
+		        		// cout << "Redcuer Called" << endl;
 		        		auto reducer = get_reducer_from_task_factory("cs6210");
 		        		reducer->impl_->_fileNumber = request_.reducerquery().partitionid();
+
 		        		cout<<"Partitionid="<<request_.reducerquery().partitionid()<<endl;
 		        		for(const auto fileName : request_.reducerquery().locations().filename()){
 		        			vector<string> values;
 		        			string line;
-		        			ifstream fileObj(fileName);
+		        			ifstream fileObj("temp/" + fileName);
 		        			while(getline(fileObj, line)) {
 		        				values.push_back(line);
 		        			}
 		        			fileObj.close();
-		        			reducer->reduce(fileName, values);
+		        			reducer->reduce(fileName.substr(0,fileName.length()-4), values);
 		        		}
+		        		FileLocations *locations;
+						locations = reply_.mutable_locations();
+						locations->add_filename(to_string(request_.reducerquery().partitionid()) + ".txt");
+		        		status_ = FINISH;
+						responder_.Finish(reply_, Status::OK, this);
 		        	}
 		      } else {
 		        GPR_ASSERT(status_ == FINISH);

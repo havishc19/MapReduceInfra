@@ -1,1 +1,2 @@
-rm -rf *.txt
+rm -rf ./temp/*.txt
+rm -rf ./output/*.txt

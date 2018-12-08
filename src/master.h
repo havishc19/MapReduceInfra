@@ -112,12 +112,12 @@ void Master::makeMapperRpcCall(string worker_address, int worker_id){
 		call->worker_address = worker_address;
 		call->worker_id = worker_id;
 		query.set_type(0);
-		cout << "Making RPC Call on worker_id : " << worker_id << " - addr: " << worker_address << endl; 
+		// cout << "Making RPC Call on worker_id : " << worker_id << " - addr: " << worker_address << endl; 
   		call->response_reader = stubs_[worker_id]->PrepareAsyncmapReduceQuery(&call->context, query, &cq);
 
 		call->response_reader->StartCall();
   		call->response_reader->Finish(&call->reply, &call->status, (void*)call);
-  		cout << "Done RPC" << endl;
+  		// cout << "Done RPC" << endl;
 
 }
 
@@ -169,6 +169,10 @@ void Master::run_mapper(){
 	for(auto it = unique_filelist.begin(); it != unique_filelist.end(); it++){
 		intermediate_fileloc.push_back(*it);
 	}
+    cout << intermediate_fileloc.size() << endl;
+    
+
+
 }
 
 
@@ -198,6 +202,8 @@ void Master::makeReducerRpcCall(string worker_address, int worker_id){
 
 void Master::run_reducer(){
 	partition_size = intermediate_fileloc.size()/spec.numOutFiles;
+    cout << "Num Out Files: " << spec.numOutFiles << endl;
+    cout << "Partition Size: " << partition_size << endl;
 	int w_count = 0;
 	for(auto worker: spec.workerAddr) {
         cout << "Reducer: " << worker << endl;
@@ -219,9 +225,9 @@ void Master::run_reducer(){
 		GPR_ASSERT(ok);
 		// if (call->status.ok())  {
 
-			for (const auto result : call->reply.locations().filename()) {
-		    	std::cout << "file: " << result << std::endl;
-			}
+			// for (const auto result : call->reply.locations().filename()) {
+		 //    	std::cout << "file: " << result << std::endl;
+			// }
 
 			//break if all shards are complete.
 			if(cur_output_index >= spec.numOutFiles)
