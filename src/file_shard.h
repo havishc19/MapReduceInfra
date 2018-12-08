@@ -17,11 +17,19 @@ struct FileShard {
 	int endByte;
 };
 
+inline void printShards(vector<FileShard> &fileShards){
+
+	for(int i=0; i < fileShards.size(); i++){
+		cout << fileShards[i].id << " " << fileShards[i].filename << " " << fileShards[i].startByte << " " << fileShards[i].endByte << endl; 
+	}
+	return;
+}
 
 /* CS6210_TASK: Create fileshards from the list of input files, map_kilobytes etc. using mr_spec you populated  */ 
 inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fileShards) {
+	cout << "FileShard" << endl;
 	int shardSize = mr_spec.mapKilobytes;
-	vector<string> inputFiles = mr_spec.inFiles();
+	vector<string> inputFiles = mr_spec.inFiles;
 	// int shardSize = 500;
 	// vector<string> inputFiles{"../test/input/testdata_1.txt"};
 	int counter = 0;
@@ -50,5 +58,8 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 			fileObj.close();
 		}
 	}
+	cout << "bowbow" << endl;
+	cout << fileShards.size() << endl;
+	printShards(fileShards);
 	return true;
 }

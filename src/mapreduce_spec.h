@@ -18,7 +18,8 @@ struct MapReduceSpec {
 	string userID;
 };
 
-void parseCSV(string input, vector<string>& retVal) {
+inline vector<string> parseCSV(string input) {
+	vector<string> retVal;
 	string temp = "";
 	for(int i=0; i<input.length(); i++) {
 		if(input[i] == ',') {
@@ -29,7 +30,23 @@ void parseCSV(string input, vector<string>& retVal) {
 		}
 	}
 	retVal.push_back(temp);
-	return;
+	return retVal;
+}
+
+inline void printSpec(struct MapReduceSpec& mr_spec) {
+	cout<<mr_spec.numWorkers<<endl;
+	cout<<mr_spec.outDir<<endl;
+	cout<<mr_spec.numOutFiles<<endl;
+	cout<<mr_spec.mapKilobytes<<endl;
+	cout<<mr_spec.userID<<endl;
+	for(int i=0; i<mr_spec.workerAddr.size(); i++) {
+		cout<<mr_spec.workerAddr[i]<<":";
+	}
+	cout<<endl;
+	for(int i=0; i<mr_spec.inFiles.size(); i++) {
+		cout<<mr_spec.inFiles[i]<<":";
+	}
+	cout<<endl;
 }
 
 /* CS6210_TASK: Populate MapReduceSpec data structure with the specification from the config file */
@@ -44,10 +61,12 @@ inline bool read_mr_spec_from_config_file(const std::string& config_filename, Ma
 				mr_spec.numWorkers = stoi(val);
 			}
 			if(key == "worker_ipaddr_ports") {
-				parseCSV(val, mr_spec.workerAddr);
+				vector<string> temp = parseCSV(val);
+				mr_spec.workerAddr = temp;
 			}
 			if(key == "input_files") {
-				parseCSV(val, mr_spec.inFiles);
+				vector<string> temp = parseCSV(val);
+				mr_spec.inFiles = temp;
 			}
 			if(key == "output_dir") {
 				mr_spec.outDir = val;
@@ -63,7 +82,8 @@ inline bool read_mr_spec_from_config_file(const std::string& config_filename, Ma
 			}
 		}
 		inFile.close();
-	}	
+	}
+	printSpec(mr_spec);	
 	return true;
 }
 
@@ -73,18 +93,4 @@ inline bool validate_mr_spec(const MapReduceSpec& mr_spec) {
 	return true;
 }
 
-void printSpec(struct MapReduceSpec& mr_spec) {
-	cout<<mr_spec.numWorkers<<endl;
-	cout<<mr_spec.outDir<<endl;
-	cout<<mr_spec.numOutFiles<<endl;
-	cout<<mr_spec.mapKilobytes<<endl;
-	cout<<mr_spec.userID<<endl;
-	for(int i=0; i<mr_spec.workerAddr.size(); i++) {
-		cout<<mr_spec.workerAddr[i]<<":";
-	}
-	cout<<endl;
-	for(int i=0; i<mr_spec.inFiles.size(); i++) {
-		cout<<mr_spec.inFiles[i]<<":";
-	}
-	cout<<endl;
-}
+
