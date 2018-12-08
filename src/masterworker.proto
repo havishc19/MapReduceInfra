@@ -1,3 +1,29 @@
 syntax = "proto3";
 
 package masterworker;
+
+service MasterWorker{
+	  
+	rpc MapperTask (MapperQuery) returns (WorkerReply) {}
+	rpc ReduceTask (ReduceQuery) returns (WorkerReply) {}
+}
+
+
+message MapperQuery {
+	string filename = 1;
+	int start = 2;
+	int end = 3;
+}
+
+message ReduceQuery {
+	FileLocations locations = 1;
+}
+
+message WorkerReply {
+	FileLocations locations = 1;
+}
+
+message FileLocations {
+	repeated string filename = 1;
+}
+
