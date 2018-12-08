@@ -10,9 +10,14 @@ service MasterWorker{
 
 
 message MapperQuery {
-	string filename = 1;
-	int start = 2;
-	int end = 3;
+	Shard shard = 1;
+}
+
+message Shard {
+	int id = 1;
+	string filename = 2;
+	int startByte = 3;
+	int endByte = 4;
 }
 
 message ReduceQuery {
