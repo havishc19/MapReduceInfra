@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 using namespace std;
 
@@ -16,6 +17,8 @@ struct BaseMapperInternal {
 		/* DON'T change this function's signature */
 		void emit(const std::string& key, const std::string& val);
 
+
+        vector<string> _fileNames;
 		/* NOW you can add below, data members and member functions as per the need of your implementation*/
 };
 
@@ -42,6 +45,7 @@ inline void BaseMapperInternal::emit(const std::string& key, const std::string& 
 		outfile << val+"\n";
 		outfile.close();
     }
+    _fileNames.push_back(key+".txt");
 }
 
 

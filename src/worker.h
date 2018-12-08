@@ -87,6 +87,7 @@ class Worker {
 		        	cout << "Reached Here " << endl;
 	        		// Mapper query
 					if(request_.type() == 0) {
+						auto mapper = get_mapper_from_task_factory("cs6210");
 		        		// Get shard and details
 			        	Shard sh = request_.mapperquery().shard();
 			        	string filename = sh.filename();
@@ -104,9 +105,20 @@ class Worker {
 							fileObj.close();
 							inputLine = line;
 							cout << line << endl;
-							auto mapper = get_mapper_from_task_factory("cs6210");
 							mapper->map(inputLine);
 						}
+						vector<string> fileNames = mapper->impl_->_fileNames;
+						FileLocations *locations;
+						locations = reply_.mutable_locations();
+
+						for(int i=0;i<fileNames.size();i++){
+							locations->add_filename(fileNames[i]);
+							// fileNames->set_filename(fileNames[i]);
+							// cout << fileNames[i] << endl;
+						}
+		        	}
+		        	else{
+
 		        	}
 		      } else {
 		        GPR_ASSERT(status_ == FINISH);
@@ -119,7 +131,7 @@ class Worker {
 		    ServerCompletionQueue* cq_;
 		    ServerContext ctx_;
 		    MasterQuery request_;
-		    // ProductReply reply_;
+		    WorkerReply reply_;
 		    ServerAsyncResponseWriter<WorkerReply> responder_;
 		    enum CallStatus { CREATE, PROCESS, FINISH };
 		    CallStatus status_;
