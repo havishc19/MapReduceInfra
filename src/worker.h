@@ -3,6 +3,7 @@
 #include <mr_task_factory.h>
 #include "mr_tasks.h"
 #include <string>
+#include <fstream>
 
 using namespace std;
 
@@ -84,6 +85,28 @@ class Worker {
 		                                  this);
 		      } else if (status_ == PROCESS) {
 		        	cout << "Reached Here " << endl;
+	        		// Mapper query
+					if(request_.type() == 0) {
+		        		// Get shard and details
+			        	Shard sh = request_.mapperquery().shard();
+			        	string filename = sh.filename;
+			        	int startByte = sh.startByte;
+			        	int endByte = sh.endByte;
+
+			        	//Read filename from startByte to endByte and create input string for mapper
+	        			ifstream fileObj(filename);
+						string inputLine = "";
+						if(fileObj.is_open()) {
+							fileObj.seekg(startByte, ios::beg);
+							char line[endByte-startByte+2];
+							fileObj.read(line, endByte-startByte+1);
+							line[endByte-startByte+1] = 0;
+							fileObj.close();
+							inputLine = line;
+							auto mapper = get_mapper_from_task_factory("cs6210");
+							mapper->map(inputLine);
+						}
+		        	}
 		      } else {
 		        GPR_ASSERT(status_ == FINISH);
 		        delete this;
