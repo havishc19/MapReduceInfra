@@ -87,34 +87,26 @@ Master::Master(const MapReduceSpec& mr_spec, const std::vector<FileShard>& file_
 
 void Master::run_mapper(){
 	MapperQuery *mapper_query;
-	MasterQuery *query;
+	MasterQuery query;
 	Shard *shard;
 	int w_count = 0;
 	for(auto worker: spec.workerAddr) {
 		
         cout << worker << endl;
-        mapper_query = new MapperQuery();
-        shard = new Shard();
-        query = new MasterQuery();
+        mapper_query = query.mutable_mapperquery();
+        shard = mapper_query->mutable_shard();
 		shard->set_filename(shards[cur_shard_index].filename);
 		shard->set_id(shards[cur_shard_index].id);
 		shard->set_startbyte(shards[cur_shard_index].startByte);
 		shard->set_endbyte(shards[cur_shard_index].endByte);
 
-		mapper_query->set_allocated_shard(shard);
-		query->set_allocated_mapperquery(mapper_query);
-
 
 		AsyncClientCall* call = new AsyncClientCall;
-  		call->response_reader = stubs_[w_count]->PrepareAsyncmapReduceQuery(&call->context, *query, &cq);
+  		call->response_reader = stubs_[w_count]->PrepareAsyncmapReduceQuery(&call->context, query, &cq);
 
 		call->response_reader->StartCall();
   		call->response_reader->Finish(&call->reply, &call->status, (void*)call);
-        cout << "bowbowbow" << endl;
 		w_count++;
-		// delete shard;
-		// delete query;
-		// delete mapper_query;
 	}
 
 	void* got_tag;
