@@ -118,17 +118,18 @@ class Worker {
 						}
 		        	}
 		        	else{
-		        		auto reducer = get_mapper_from_task_factory("cs6210");
-		        		reducer->impl_->_fileNumer = stoi(request_.reducerquery().partitionNumber());
-		        		for(const auto fileName : request_.reducerquery().locations()){
+		        		auto reducer = get_reducer_from_task_factory("cs6210");
+		        		reducer->impl_->_fileNumber = request_.reducerquery().partitionid();
+		        		for(const auto fileName : request_.reducerquery().locations().filename()){
 		        			cout << fileName << endl;
 		        			vector<string> values;
 		        			string line;
-		        			ifstream fileObj(filename);
+		        			ifstream fileObj(fileName);
 		        			while(getline(fileObj, line)) {
 		        				values.push_back(line);
 		        			}
 		        			fileObj.close();
+		        			reducer->reduce(fileName, values);
 		        		}
 		        	}
 		      } else {
