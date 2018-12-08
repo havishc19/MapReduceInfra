@@ -4,8 +4,8 @@ package masterworker;
 
 service MasterWorker{
 	  
-	rpc MapperTask (MapperQuery) returns (WorkerReply) {}
-	rpc ReduceTask (ReduceQuery) returns (WorkerReply) {}
+	rpc mapReduceQuery (MasterQuery) returns (WorkerReply) {}
+	
 }
 
 
@@ -30,5 +30,10 @@ message WorkerReply {
 
 message FileLocations {
 	repeated string filename = 1;
+}
+
+message MasterQuery {
+	MapperQuery mapperQuery = 1;
+	ReducerQuery reducerQuery = 2;
 }
 
