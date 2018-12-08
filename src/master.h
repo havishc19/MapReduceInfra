@@ -43,6 +43,7 @@ class Master {
 		/* NOW you can add below, data members and member functions as per the need of your implementation*/
 	//functions
 	void run_mapper();
+	void makeMasterRpcCall(string,int,int);
 
 	MapReduceSpec spec;
 	vector<FileShard> shards;
@@ -59,6 +60,9 @@ class Master {
     struct AsyncClientCall {
       // Container for the data we expect from the server.
       WorkerReply reply;
+
+      string worker_address;
+      int worker_id; // for the worker channel
 
       // Context for the client. It could be used to convey extra information to
       // the server and/or tweak certain RPC behaviors.
@@ -85,14 +89,10 @@ Master::Master(const MapReduceSpec& mr_spec, const std::vector<FileShard>& file_
       }
 }
 
-void Master::run_mapper(){
-	MapperQuery *mapper_query;
-	MasterQuery query;
-	Shard *shard;
-	int w_count = 0;
-	for(auto worker: spec.workerAddr) {
-		
-        cout << worker << endl;
+void Master::makeMasterRpcCall(string worker_address, int worker_id, int cur_shard_index){
+		MapperQuery *mapper_query;
+		MasterQuery query;
+		Shard *shard;
         mapper_query = query.mutable_mapperquery();
         shard = mapper_query->mutable_shard();
 		shard->set_filename(shards[cur_shard_index].filename);
@@ -102,11 +102,22 @@ void Master::run_mapper(){
 
 
 		AsyncClientCall* call = new AsyncClientCall;
-  		call->response_reader = stubs_[w_count]->PrepareAsyncmapReduceQuery(&call->context, query, &cq);
+		call->worker_address = worker_address;
+		call->worker_id = worker_id;
+  		call->response_reader = stubs_[worker_id]->PrepareAsyncmapReduceQuery(&call->context, query, &cq);
 
 		call->response_reader->StartCall();
   		call->response_reader->Finish(&call->reply, &call->status, (void*)call);
+
+}
+void Master::run_mapper(){
+	
+	int w_count = 0;
+	for(auto worker: spec.workerAddr) {
+        cout << worker << endl;
+        makeMasterRpcCall(worker, w_count, cur_shard_index);
 		w_count++;
+		cur_shard_index++;
 	}
 
 	void* got_tag;
@@ -125,6 +136,13 @@ void Master::run_mapper(){
 			for (const auto result : call->reply.locations().filename()) {
 		    	std::cout << "file: " << result << std::endl;
 			}
+
+			//break if all shards are complete.
+			if(cur_shard_index >= shards.size())
+				break;
+
+			makeMasterRpcCall(call->worker_address, call->worker_id, cur_shard_index);
+			cur_shard_index++;
 		}
 		else{
 			status = call->status;
