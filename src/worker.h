@@ -85,7 +85,7 @@ class Worker {
 		                                  this);
 		      } else if (status_ == PROCESS) {
 	        		// Mapper query
-		      		cout << request_.type() << endl;
+		      		cout << "Worker type: " << request_.type() << endl;
 					if(request_.type() == 0) {
 						cout << "Mapper Req received!" << endl;
 						auto mapper = get_mapper_from_task_factory("cs6210");
@@ -114,15 +114,16 @@ class Worker {
 						for(int i=0;i<fileNames.size();i++){
 							locations->add_filename(fileNames[i]);
 						}
-						// status_ = FINISH;
+						status_ = FINISH;
 						responder_.Finish(reply_, Status::OK, this);
 		        	}
 		        	else{
 		        		cout << "Redcuer Called" << endl;
 		        		auto reducer = get_reducer_from_task_factory("cs6210");
 		        		reducer->impl_->_fileNumber = request_.reducerquery().partitionid();
+		        		cout<<"Partitionid="<<request_.reducerquery().partitionid()<<endl;
 		        		for(const auto fileName : request_.reducerquery().locations().filename()){
-		        			// cout << fileName << endl;
+		        			cout << fileName << endl;
 		        			vector<string> values;
 		        			string line;
 		        			ifstream fileObj(fileName);
