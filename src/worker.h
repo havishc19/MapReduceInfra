@@ -89,9 +89,9 @@ class Worker {
 					if(request_.type() == 0) {
 		        		// Get shard and details
 			        	Shard sh = request_.mapperquery().shard();
-			        	string filename = sh.filename;
-			        	int startByte = sh.startByte;
-			        	int endByte = sh.endByte;
+			        	string filename = sh.filename();
+			        	int startByte = sh.startbyte();
+			        	int endByte = sh.endbyte();
 
 			        	//Read filename from startByte to endByte and create input string for mapper
 	        			ifstream fileObj(filename);
@@ -103,6 +103,7 @@ class Worker {
 							line[endByte-startByte+1] = 0;
 							fileObj.close();
 							inputLine = line;
+							cout << line << endl;
 							auto mapper = get_mapper_from_task_factory("cs6210");
 							mapper->map(inputLine);
 						}
