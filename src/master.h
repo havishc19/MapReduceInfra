@@ -112,10 +112,12 @@ void Master::makeMapperRpcCall(string worker_address, int worker_id){
 		call->worker_address = worker_address;
 		call->worker_id = worker_id;
 		query.set_type(0);
+		cout << "Making RPC Call on worker_id : " << worker_id << " - addr: " << worker_address << endl; 
   		call->response_reader = stubs_[worker_id]->PrepareAsyncmapReduceQuery(&call->context, query, &cq);
 
 		call->response_reader->StartCall();
   		call->response_reader->Finish(&call->reply, &call->status, (void*)call);
+  		cout << "Done RPC" << endl;
 
 }
 
@@ -145,7 +147,6 @@ void Master::run_mapper(){
 		if (call->status.ok())  {
 
 			for (const auto result : call->reply.locations().filename()) {
-		    	std::cout << "file: " << result << std::endl;
 		    	unique_filelist.insert(result);
 			}
 
@@ -216,7 +217,7 @@ void Master::run_reducer(){
 		AsyncClientCall* call = static_cast<AsyncClientCall*>(got_tag);
 
 		GPR_ASSERT(ok);
-		if (call->status.ok())  {
+		// if (call->status.ok())  {
 
 			for (const auto result : call->reply.locations().filename()) {
 		    	std::cout << "file: " << result << std::endl;
@@ -228,12 +229,12 @@ void Master::run_reducer(){
 
 			makeReducerRpcCall(call->worker_address, call->worker_id);
 			cur_output_index++;
-		}
-		else{
-			status = call->status;
-			std::cerr << "Hi there" << endl;
-		  	break;
-		} 
+		// }
+		// else{
+		// 	status = call->status;
+		// 	std::cerr << "Hi there" << endl;
+		//   	break;
+		// } 
 
 		// Once we're complete, deallocate the call object.
 		delete call;

@@ -85,6 +85,7 @@ class Worker {
 		                                  this);
 		      } else if (status_ == PROCESS) {
 	        		// Mapper query
+			      	new CallData(service_, cq_);
 		      		cout << "Worker type: " << request_.type() << endl;
 					if(request_.type() == 0) {
 						cout << "Mapper Req received!" << endl;
