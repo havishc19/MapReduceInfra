@@ -118,7 +118,18 @@ class Worker {
 						}
 		        	}
 		        	else{
-
+		        		auto reducer = get_mapper_from_task_factory("cs6210");
+		        		reducer->impl_->_fileNumer = stoi(request_.reducerquery().partitionNumber());
+		        		for(const auto fileName : request_.reducerquery().locations()){
+		        			cout << fileName << endl;
+		        			vector<string> values;
+		        			string line;
+		        			ifstream fileObj(filename);
+		        			while(getline(fileObj, line)) {
+		        				values.push_back(line);
+		        			}
+		        			fileObj.close();
+		        		}
 		        	}
 		      } else {
 		        GPR_ASSERT(status_ == FINISH);
