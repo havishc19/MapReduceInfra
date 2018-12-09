@@ -54,6 +54,8 @@ class Master {
 	int cur_output_index;
 	int partition_size;
 
+	int busy_workers;
+
 	//intermediate file_locations for each mapper in sorted order
 	vector<string> intermediate_fileloc;
 
@@ -90,6 +92,7 @@ Master::Master(const MapReduceSpec& mr_spec, const std::vector<FileShard>& file_
 	shards = file_shards;
 	cur_shard_index =  0;
 	cur_output_index =  0;
+	busy_workers = 0;
 
 	 for(auto addr : spec.workerAddr){
         stubs_.emplace_back( MasterWorker::NewStub(grpc::CreateChannel(addr, grpc::InsecureChannelCredentials())) ); 
@@ -121,14 +124,28 @@ void Master::makeMapperRpcCall(string worker_address, int worker_id){
 
 }
 
+struct alpha_sort
+{
+	  bool operator() (const string& lhs, const string& rhs) const {
+        string s1, s2;
+        for(int i=0; i<lhs.length(); i++)
+        	s1 += tolower(lhs[i]);
+        for(int i=0; i<rhs.length(); i++)
+        	s2 += tolower(rhs[i]);
+        return s1 < s2;
+    }
+};
 void Master::run_mapper(){
 	
 	int w_count = 0;
 	for(auto worker: spec.workerAddr) {
+        if(cur_shard_index>=shards.size())
+        	break;
         cout << worker << endl;
         makeMapperRpcCall(worker, w_count);
 		w_count++;
 		cur_shard_index++;
+		busy_workers++;
 	}
 
 	void* got_tag;
@@ -138,24 +155,33 @@ void Master::run_mapper(){
 
 	Status status = Status::OK;
 
-	set<string> unique_filelist;
+	set<string,alpha_sort> unique_filelist;
 
 	while (cq.Next(&got_tag, &ok)) {
+
 		AsyncClientCall* call = static_cast<AsyncClientCall*>(got_tag);
 
+
+		busy_workers--;
 		GPR_ASSERT(ok);
 		if (call->status.ok())  {
 
 			for (const auto result : call->reply.locations().filename()) {
+				cout<<result<<" :[MASTER RESULT]"<<endl;
 		    	unique_filelist.insert(result);
 			}
+			cout << "RPC done" << endl;
 
 			//break if all shards are complete.
-			if(cur_shard_index >= shards.size())
+			if(busy_workers == 0)
 				break;
 
-			makeMapperRpcCall(call->worker_address, call->worker_id);
-			cur_shard_index++;
+	        cout << call->worker_address << endl;
+	        if(cur_shard_index < shards.size()) {
+				makeMapperRpcCall(call->worker_address, call->worker_id);
+				cur_shard_index++;
+				busy_workers++;
+			}
 		}
 		else{
 			status = call->status;
@@ -167,6 +193,7 @@ void Master::run_mapper(){
 		delete call;
 	}
 	for(auto it = unique_filelist.begin(); it != unique_filelist.end(); it++){
+		//cout << *it << endl;
 		intermediate_fileloc.push_back(*it);
 	}
     cout << intermediate_fileloc.size() << endl;
@@ -183,8 +210,8 @@ void Master::makeReducerRpcCall(string worker_address, int worker_id){
 
         reducer_query = query.mutable_reducerquery();
         locations = reducer_query->mutable_locations();
-        for(int i=0 ; i<partition_size; i++){
-        	locations->add_filename(intermediate_fileloc[cur_output_index+i]);
+        for(int i=0 ; i<partition_size && cur_output_index*partition_size+i < intermediate_fileloc.size(); i++){
+        	locations->add_filename(intermediate_fileloc[cur_output_index*partition_size+i]);
         }
         reducer_query->set_partitionid(cur_output_index);
 
@@ -207,6 +234,8 @@ void Master::run_reducer(){
 	int w_count = 0;
 	for(auto worker: spec.workerAddr) {
         cout << "Reducer: " << worker << endl;
+        if(cur_output_index>=partition_size)
+        	break;
         makeReducerRpcCall(worker, w_count);
 		w_count++;
 		cur_output_index++;

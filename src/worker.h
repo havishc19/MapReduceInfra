@@ -115,6 +115,7 @@ class Worker {
 							fileObj.close();
 							inputLine = line;
 							ReplaceStringInPlace(inputLine, "\n", " ");
+							cout<<inputLine<<" [INPUT]"<<endl;
 							mapper->map(inputLine);
 						}
 						vector<string> fileNames = mapper->impl_->_fileNames;
@@ -122,6 +123,7 @@ class Worker {
 						locations = reply_.mutable_locations();
 
 						for(int i=0;i<fileNames.size();i++){
+							cout<<fileNames[i]<<" :[FILE]"<<endl;
 							locations->add_filename(fileNames[i]);
 						}
 						status_ = FINISH;

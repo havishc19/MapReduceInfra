@@ -41,24 +41,34 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 		int curBytes = 0;
 		if(fileObj.is_open()) {
 			while(getline(fileObj, line)) {
-				if(curBytes + line.length() <= shardSize) {
+				cout<<curBytes<<":"<<line.length()<<":"<<shardSize<<endl;
+				if(curBytes + line.length() <= shardSize || curBytes == 0) {
+					if(curBytes != 0) {
+						curBytes++;
+					}
 					curBytes += line.length();
 				} else {
 					struct FileShard fs;
 					fs.id = counter++; 
 					fs.filename = inputFiles[i];
 					fs.startByte = start;
-					fs.endByte = start+curBytes;
+					fs.endByte = start+curBytes-1;
 					fileShards.push_back(fs);
 					start += curBytes+1;
 					curBytes = line.length();
 				}
 			}
+			struct FileShard fs;
+			fs.id = counter++; 
+			fs.filename = inputFiles[i];
+			fs.startByte = start;
+			fs.endByte = start+curBytes-1;
+			fileShards.push_back(fs);
 			fileObj.close();
 		}
 	}
-	// cout << "bowbow" << endl;
-	// cout << fileShards.size() << endl;
-	// printShards(fileShards);
+	cout << "bowbow" << endl;
+	cout << fileShards.size() << endl;
+	printShards(fileShards);
 	return true;
 }
