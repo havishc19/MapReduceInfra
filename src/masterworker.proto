@@ -13,11 +13,15 @@ message MapperQuery {
 	Shard shard = 1;
 }
 
+message ShardDetails {
+	string filename = 1;
+	int32 startByte = 2;
+	int32 endByte = 3;	
+}
+
 message Shard {
 	int32 id = 1;
-	string filename = 2;
-	int32 startByte = 3;
-	int32 endByte = 4;
+	repeated ShardDetails details = 2;
 }
 
 message ReducerQuery {

@@ -100,25 +100,27 @@ class Worker {
 						auto mapper = get_mapper_from_task_factory("cs6210");
 		        		// Get shard and details
 			        	Shard sh = request_.mapperquery().shard();
-			        	string filename = sh.filename();
-			        	int startByte = sh.startbyte();
-			        	int endByte = sh.endbyte();
+			        	string inputLine = "";
+						for(int i=0; i<sh.details().size(); i++) {
+							string filename = sh.details()[i].filename();
+				        	int startByte = sh.details()[i].startbyte();
+				        	int endByte = sh.details()[i].endbyte();
 
-			        	//Read filename from startByte to endByte and create input string for mapper
-	        			ifstream fileObj(filename);
-						string inputLine = "";
-						if(fileObj.is_open()) {
-							fileObj.seekg(startByte, ios::beg);
-							char line[endByte-startByte+2];
-							fileObj.read(line, endByte-startByte+1);
-							line[endByte-startByte+1] = 0;
-							fileObj.close();
-							inputLine = line;
-							ReplaceStringInPlace(inputLine, "\n", " ");
-							cout<<inputLine<<" [INPUT]"<<endl;
-							mapper->map(inputLine);
+				        	//Read filename from startByte to endByte and create input string for mapper
+		        			ifstream fileObj(filename);
+							if(fileObj.is_open()) {
+								fileObj.seekg(startByte, ios::beg);
+								char line[endByte-startByte+2];
+								fileObj.read(line, endByte-startByte+1);
+								line[endByte-startByte+1] = 0;
+								fileObj.close();
+								inputLine = line;
+								ReplaceStringInPlace(inputLine, "\n", " ");
+								cout<<inputLine<<" [INPUT]"<<endl;
+								mapper->map(inputLine);
+							}		
 						}
-						vector<string> fileNames = mapper->impl_->_fileNames;
+			        	vector<string> fileNames = mapper->impl_->_fileNames;
 						FileLocations *locations;
 						locations = reply_.mutable_locations();
 

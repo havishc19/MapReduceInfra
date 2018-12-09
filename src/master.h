@@ -19,6 +19,7 @@ using grpc::Status;
 
 using masterworker::MapperQuery;
 using masterworker::Shard;
+using masterworker::ShardDetails;
 using masterworker::ReducerQuery;
 using masterworker::WorkerReply;
 using masterworker::FileLocations;
@@ -105,10 +106,22 @@ void Master::makeMapperRpcCall(string worker_address, int worker_id){
 		Shard *shard;
         mapper_query = query.mutable_mapperquery();
         shard = mapper_query->mutable_shard();
-		shard->set_filename(shards[cur_shard_index].filename);
-		shard->set_id(shards[cur_shard_index].id);
-		shard->set_startbyte(shards[cur_shard_index].startByte);
-		shard->set_endbyte(shards[cur_shard_index].endByte);
+
+        shard->set_id(shards[cur_shard_index].id);
+		
+        for(int i=0; i<shards[cur_shard_index].details.size(); i++) {
+        	shard->add_details();
+        	ShardDetails *details = shard->mutable_details(i);
+        	details->set_filename(shards[cur_shard_index].details[i].filename);
+        	details->set_startbyte(shards[cur_shard_index].details[i].startByte);
+			details->set_endbyte(shards[cur_shard_index].details[i].endByte);
+        }
+
+
+		// shard->set_filename(shards[cur_shard_index].filename);
+		// shard->set_id(shards[cur_shard_index].id);
+		// shard->set_startbyte(shards[cur_shard_index].startByte);
+		// shard->set_endbyte(shards[cur_shard_index].endByte);
 
 
 		AsyncClientCall* call = new AsyncClientCall;
