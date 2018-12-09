@@ -241,7 +241,7 @@ void Master::makeReducerRpcCall(string worker_address, int worker_id){
 }
 
 void Master::run_reducer(){
-	partition_size = intermediate_fileloc.size()/spec.numOutFiles;
+	partition_size = intermediate_fileloc.size()/spec.numOutFiles + 1;
     cout << "Num Out Files: " << spec.numOutFiles << endl;
     cout << "Partition Size: " << partition_size << endl;
 	int w_count = 0;
