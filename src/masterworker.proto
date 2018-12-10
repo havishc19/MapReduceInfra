@@ -41,5 +41,6 @@ message MasterQuery {
 	MapperQuery mapperQuery = 1;
 	ReducerQuery reducerQuery = 2;
 	int32 type = 3;
+	string userID = 4;
 }
 

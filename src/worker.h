@@ -97,7 +97,7 @@ class Worker {
 		      		// cout << "Worker type: " << request_.type() << endl;
 					if(request_.type() == 0) {
 						// cout << "Mapper Req received!" << endl;
-						auto mapper = get_mapper_from_task_factory("cs6210");
+						auto mapper = get_mapper_from_task_factory(request_.userid());
 		        		// Get shard and details
 			        	Shard sh = request_.mapperquery().shard();
 			        	string inputLine = "";
@@ -133,7 +133,7 @@ class Worker {
 		        	}
 		        	else{
 		        		// cout << "Redcuer Called" << endl;
-		        		auto reducer = get_reducer_from_task_factory("cs6210");
+		        		auto reducer = get_reducer_from_task_factory(request_.userid());
 		        		reducer->impl_->_fileNumber = request_.reducerquery().partitionid();
 
 		        		cout<<"Partitionid="<<request_.reducerquery().partitionid()<<endl;

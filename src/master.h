@@ -106,6 +106,7 @@ void Master::makeMapperRpcCall(string worker_address, int worker_id){
 		Shard *shard;
         mapper_query = query.mutable_mapperquery();
         shard = mapper_query->mutable_shard();
+        query.set_userid(spec.userID);
 
         shard->set_id(shards[cur_shard_index].id);
 		
@@ -225,6 +226,7 @@ void Master::makeReducerRpcCall(string worker_address, int worker_id){
 		ReducerQuery *reducer_query;
 		MasterQuery query;
 		FileLocations *locations;
+		query.set_userid(spec.userID);
 
         reducer_query = query.mutable_reducerquery();
         locations = reducer_query->mutable_locations();
