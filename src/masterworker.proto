@@ -27,6 +27,7 @@ message Shard {
 message ReducerQuery {
 	int32 partitionid = 1;
 	FileLocations locations = 2;
+	string outputDir = 3;
 }
 
 message WorkerReply {

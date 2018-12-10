@@ -64,6 +64,8 @@ struct BaseReducerInternal {
 		void emit(const std::string& key, const std::string& val);
 
         int _fileNumber; 
+
+        string _outputDir;
 		/* NOW you can add below, data members and member functions as per the need of your implementation*/
 };
 
@@ -76,7 +78,7 @@ inline BaseReducerInternal::BaseReducerInternal() {
 
 /* CS6210_TASK Implement this function */
 inline void BaseReducerInternal::emit(const std::string& key, const std::string& val) {
-    string fileName = "output/" + to_string(_fileNumber) + ".txt";
+    string fileName = _outputDir + "/" + to_string(_fileNumber) + ".txt";
     ifstream testStream(fileName);
     if(testStream.good()) {
         //File already exists -> append

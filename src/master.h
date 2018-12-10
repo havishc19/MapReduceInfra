@@ -229,6 +229,7 @@ void Master::makeReducerRpcCall(string worker_address, int worker_id){
 		query.set_userid(spec.userID);
 
         reducer_query = query.mutable_reducerquery();
+        reducer_query->set_outputdir(spec.outDir);
         locations = reducer_query->mutable_locations();
         for(int i=0 ; i<partition_size && cur_output_index*partition_size+i < intermediate_fileloc.size(); i++){
         	locations->add_filename(intermediate_fileloc[cur_output_index*partition_size+i]);

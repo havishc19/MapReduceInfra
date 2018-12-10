@@ -135,6 +135,7 @@ class Worker {
 		        		// cout << "Redcuer Called" << endl;
 		        		auto reducer = get_reducer_from_task_factory(request_.userid());
 		        		reducer->impl_->_fileNumber = request_.reducerquery().partitionid();
+		        		reducer->impl_->_outputDir = request_.reducerquery().outputdir();
 
 		        		cout<<"Partitionid="<<request_.reducerquery().partitionid()<<endl;
 		        		for(const auto fileName : request_.reducerquery().locations().filename()){
