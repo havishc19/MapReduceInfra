@@ -140,12 +140,17 @@ void Master::makeMapperRpcCall(string worker_address, int worker_id){
 struct alpha_sort
 {
 	  bool operator() (const string& lhs, const string& rhs) const {
-        string s1, s2;
-        for(int i=0; i<lhs.length(); i++)
-        	s1 += tolower(lhs[i]);
-        for(int i=0; i<rhs.length(); i++)
-        	s2 += tolower(rhs[i]);
-        return s1 < s2;
+	  	for(int i=0; i<lhs.size() && i<rhs.size(); i++) {
+	  		if(tolower(lhs[i]) == tolower(rhs[i])) {
+	  			if(lhs[i] > rhs[i]) {
+	  				return true;
+	  			} else if(lhs[i] < rhs[i]) {
+	  				return false;
+	  			}
+	  		} else {
+	  			return tolower(lhs[i]) < tolower(rhs[i]);
+	  		}
+	  	}
     }
 };
 void Master::run_mapper(){
