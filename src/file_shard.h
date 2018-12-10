@@ -36,7 +36,7 @@ inline void printShards(vector<FileShard> &fileShards){
 
 /* CS6210_TASK: Create fileshards from the list of input files, map_kilobytes etc. using mr_spec you populated  */ 
 inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fileShards) {
-	int shardSize = mr_spec.mapKilobytes;
+	int shardSize = mr_spec.mapKilobytes*1000;
 	vector<string> inputFiles = mr_spec.inFiles;
 	int counter = 0;
 	vector<struct shardDetails> tempDetVec;

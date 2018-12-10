@@ -90,7 +90,8 @@ inline bool read_mr_spec_from_config_file(const std::string& config_filename, Ma
 
 /* CS6210_TASK: validate the specification read from the config file */
 inline bool validate_mr_spec(const MapReduceSpec& mr_spec) {
+	if(mr_spec.numWorkers == 0 || mr_spec.workerAddr.size() == 0 || mr_spec.inFiles.size() == 0 || mr_spec.outDir == 0 || mr_spec.numOutFiles == 0 || mr_spec.mapKilobytes == 0 || mr_spec.userID == "") {
+		return false;
+	}
 	return true;
 }
-
-
