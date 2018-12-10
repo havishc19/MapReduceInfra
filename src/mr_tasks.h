@@ -92,5 +92,4 @@ inline void BaseReducerInternal::emit(const std::string& key, const std::string&
         outfile << key + "," + val + "\n";
         outfile.close();
     }
-	// std::cout << "Dummy emit by BaseReducerInternal: " << key << ", " << val << std::endl;
 }

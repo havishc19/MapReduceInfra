@@ -43,16 +43,13 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 	int start = 0;
 	int curBytes = 0;
 	for(int i=0; i<inputFiles.size(); i++) {
-		cout<<"Entrering new file"<<endl;
 		bool firstLineFlag = true;
 		int fileOffset = 0;
 		ifstream fileObj(inputFiles[i]);
 		string line;
 		if(fileObj.is_open()) {
 			while(getline(fileObj, line)) {
-				cout<<curBytes<<":"<<line.length()<<":"<<shardSize<<":"<<fileOffset<<endl;
 				if(curBytes + line.length() <= shardSize || curBytes == 0) {
-					cout<<inputFiles[i]<<"::::"<<curBytes<<"::::"<<fileOffset<<endl;
 					if(fileOffset != 0) {
 						curBytes++;
 						fileOffset++;
@@ -87,17 +84,7 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 			tempDet.endByte = start+fileOffset-1;
 			tempDetVec.push_back(tempDet);
 			start = 0;
-			// curBytes += line.length();
-			cout<<"setting to zero"<<endl;
 			fileOffset = 0;
-
-
-			// struct FileShard fs;
-			// fs.id = counter++; 
-			// fs.filename = inputFiles[i];
-			// fs.startByte = start;
-			// fs.endByte = start+curBytes-1;
-			// fileShards.push_back(fs);
 			fileObj.close();
 		}
 	}
@@ -108,8 +95,5 @@ inline bool shard_files(const MapReduceSpec& mr_spec, std::vector<FileShard>& fi
 		tempDetVec.clear();
 		fileShards.push_back(fs);
 	}
-	// cout << "bowbow" << endl;
-	// cout << fileShards.size() << endl;
-	printShards(fileShards);
 	return true;
 }

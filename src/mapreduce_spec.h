@@ -33,22 +33,6 @@ inline vector<string> parseCSV(string input) {
 	return retVal;
 }
 
-inline void printSpec(struct MapReduceSpec& mr_spec) {
-	cout<<mr_spec.numWorkers<<endl;
-	cout<<mr_spec.outDir<<endl;
-	cout<<mr_spec.numOutFiles<<endl;
-	cout<<mr_spec.mapKilobytes<<endl;
-	cout<<mr_spec.userID<<endl;
-	for(int i=0; i<mr_spec.workerAddr.size(); i++) {
-		cout<<mr_spec.workerAddr[i]<<":";
-	}
-	cout<<endl;
-	for(int i=0; i<mr_spec.inFiles.size(); i++) {
-		cout<<mr_spec.inFiles[i]<<":";
-	}
-	cout<<endl;
-}
-
 /* CS6210_TASK: Populate MapReduceSpec data structure with the specification from the config file */
 inline bool read_mr_spec_from_config_file(const std::string& config_filename, MapReduceSpec& mr_spec) {
 	ifstream inFile(config_filename);
@@ -83,7 +67,6 @@ inline bool read_mr_spec_from_config_file(const std::string& config_filename, Ma
 		}
 		inFile.close();
 	}
-	// printSpec(mr_spec);	
 	return true;
 }
 

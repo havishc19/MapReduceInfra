@@ -72,7 +72,6 @@ class Worker {
 		    builder.RegisterService(&service_);
 		    cq_ = builder.AddCompletionQueue();
 		    server_ = builder.BuildAndStart();
-		    cout << "Server listening on " << server_address << endl;
 		    HandleRpcs();
 		  }
 
@@ -94,9 +93,7 @@ class Worker {
 		      } else if (status_ == PROCESS) {
 	        		// Mapper query
 			      	new CallData(service_, cq_);
-		      		// cout << "Worker type: " << request_.type() << endl;
 					if(request_.type() == 0) {
-						// cout << "Mapper Req received!" << endl;
 						auto mapper = get_mapper_from_task_factory(request_.userid());
 		        		// Get shard and details
 			        	Shard sh = request_.mapperquery().shard();
@@ -116,7 +113,6 @@ class Worker {
 								fileObj.close();
 								inputLine = line;
 								ReplaceStringInPlace(inputLine, "\n", " ");
-								cout<<inputLine<<" [INPUT]"<<endl;
 								mapper->map(inputLine);
 							}		
 						}
@@ -125,19 +121,16 @@ class Worker {
 						locations = reply_.mutable_locations();
 
 						for(int i=0;i<fileNames.size();i++){
-							cout<<fileNames[i]<<" :[FILE]"<<endl;
 							locations->add_filename(fileNames[i]);
 						}
 						status_ = FINISH;
 						responder_.Finish(reply_, Status::OK, this);
 		        	}
 		        	else{
-		        		// cout << "Redcuer Called" << endl;
 		        		auto reducer = get_reducer_from_task_factory(request_.userid());
 		        		reducer->impl_->_fileNumber = request_.reducerquery().partitionid();
 		        		reducer->impl_->_outputDir = request_.reducerquery().outputdir();
 
-		        		cout<<"Partitionid="<<request_.reducerquery().partitionid()<<endl;
 		        		for(const auto fileName : request_.reducerquery().locations().filename()){
 		        			vector<string> values;
 		        			string line;
