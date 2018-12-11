@@ -6,6 +6,7 @@
 #include<vector>
 #include<set>
 #include<unistd.h>
+#include<sys/stat.h>
 
 #include <grpc++/grpc++.h>
 #include "masterworker.grpc.pb.h"
@@ -40,6 +41,8 @@ class Master {
 
 		/* DON'T change this function's signature */
 		bool run();
+
+		~Master();
 
 	private:
 		/* NOW you can add below, data members and member functions as per the need of your implementation*/
@@ -89,6 +92,14 @@ class Master {
 /* CS6210_TASK: This is all the information your master will get from the framework.
 	You can populate your other class data members here if you want */
 Master::Master(const MapReduceSpec& mr_spec, const std::vector<FileShard>& file_shards) {
+	struct stat info; 
+    if( stat( "temp", &info ) != 0 ) {
+        const int err = mkdir("temp", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        if (-1 == err) {
+            printf("Error creating temp directory.\n");
+            exit(1);
+        }
+    }
 	spec = mr_spec;
 	shards = file_shards;
 	cur_shard_index =  0;
@@ -98,6 +109,10 @@ Master::Master(const MapReduceSpec& mr_spec, const std::vector<FileShard>& file_
 	 for(auto addr : spec.workerAddr){
         stubs_.emplace_back( MasterWorker::NewStub(grpc::CreateChannel(addr, grpc::InsecureChannelCredentials())) ); 
       }
+}
+
+Master::~Master(){
+	system("/bin/rm -rf temp");
 }
 
 void Master::makeMapperRpcCall(string worker_address, int worker_id){
@@ -269,7 +284,13 @@ void Master::run_reducer(){
 
 /* CS6210_TASK: Here you go. once this function is called you will complete whole map reduce task and return true if succeeded */
 bool Master::run() {
+	cout<<"Starting master"<<endl;
 	run_mapper();
+	cout<<"Mappers Done"<<endl;
 	run_reducer();
+	// Sleep for a second for everything to shut down gracefully
+	usleep(1*1000000);
+	cout<<"Reducers Done"<<endl;
+	cout<<"Ending master"<<endl;
 	return true;
 }

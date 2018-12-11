@@ -31,21 +31,11 @@ inline BaseMapperInternal::BaseMapperInternal() {
 
 /* CS6210_TASK Implement this function */
 inline void BaseMapperInternal::emit(const std::string& key, const std::string& val) {
-	//Check if the file for key exists
     string fileName = "temp/" + key + ".txt";
-    ifstream testStream(fileName);
-    if(testStream.good()) {
-    	//File already exists -> append
-		ofstream outfile;
-		outfile.open(fileName, ios_base::app);
-		outfile << val+"\n"; 
-		outfile.close();
-    } else {
-    	//File does not exist, create one
-    	ofstream outfile(fileName);
-		outfile << val+"\n";
-		outfile.close();
-    }
+    ofstream outfile;
+	outfile.open(fileName, ios_base::app);
+	outfile << val+"\n"; 
+	outfile.close();
     _fileNames.push_back(key+".txt");
 }
 
@@ -79,17 +69,8 @@ inline BaseReducerInternal::BaseReducerInternal() {
 /* CS6210_TASK Implement this function */
 inline void BaseReducerInternal::emit(const std::string& key, const std::string& val) {
     string fileName = _outputDir + "/" + to_string(_fileNumber) + ".txt";
-    ifstream testStream(fileName);
-    if(testStream.good()) {
-        //File already exists -> append
-        ofstream outfile;
-        outfile.open(fileName, ios_base::app);
-        outfile << key + "," + val + "\n"; 
-        outfile.close();
-    } else {
-        //File does not exist, create one
-        ofstream outfile(fileName);
-        outfile << key + "," + val + "\n";
-        outfile.close();
-    }
+    ofstream outfile;
+    outfile.open(fileName, ios_base::app);
+    outfile << key + "," + val + "\n"; 
+    outfile.close();
 }
